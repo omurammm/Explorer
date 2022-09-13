@@ -208,7 +208,7 @@ class VanillaDQN(BaseAgent):
 
   def learn(self):
     mode = 'Train'
-    batch = self.replay.sample(['state', 'action', 'reward', 'next_state', 'mask'], self.cfg['batch_size'])
+    batch = self.replay.sample(['state', 'action', 'reward', 'next_state', 'mask'], self.cfg['batch_size'], device=self.device)
     q, q_target = self.compute_q(batch), self.compute_q_target(batch)
     # Compute loss
     loss = self.loss(q, q_target)
@@ -235,13 +235,17 @@ class VanillaDQN(BaseAgent):
 
   def save_experience(self):
     mode = 'Train'
+    save_device = 'cpu'
     prediction = {}
+    # print('### add')
+    # print(self.state[mode], type(self.state[mode]))
+    # print(self.state[mode].mean())
     if self.reward[mode] is not None:
-      prediction['state'] = to_tensor(self.state[mode], self.device)
-      prediction['action'] = to_tensor(self.action[mode], self.device)
-      prediction['next_state'] = to_tensor(self.next_state[mode], self.device)
-      prediction['mask'] = to_tensor(1-self.done[mode], self.device)
-      prediction['reward'] = to_tensor(self.reward[mode], self.device)
+      prediction['state'] = to_tensor(self.state[mode], save_device)
+      prediction['action'] = to_tensor(self.action[mode], save_device)
+      prediction['next_state'] = to_tensor(self.next_state[mode], save_device)
+      prediction['mask'] = to_tensor(1-self.done[mode], save_device)
+      prediction['reward'] = to_tensor(self.reward[mode], save_device)
     self.replay.add(prediction)
 
   def get_action_size(self):
@@ -281,6 +285,9 @@ class VanillaDQN(BaseAgent):
         self.Q_net[i].train() # Set Q network back to training mode
   
   def get_action_selection_q_values(self, state):
+    # print('### input')
+    # print(state, type(state))
+    # print(state.mean())
     q_values = self.Q_net[0](state)
     q_values = to_numpy(q_values).flatten()
     return q_values

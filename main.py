@@ -11,6 +11,7 @@ def main(argv):
   parser.add_argument('--config_file', type=str, default='./configs/catcher.json', help='Configuration file for the chosen model')
   parser.add_argument('--config_idx', type=int, default=1, help='Configuration index')
   parser.add_argument('--slurm_dir', type=str, default='', help='slurm tempory directory')
+  parser.add_argument('--cuda_num', type=int, default=None)
   args = parser.parse_args()
   
   sweeper = Sweeper(args.config_file)
@@ -24,6 +25,12 @@ def main(argv):
   cfg.setdefault('gradient_clip', -1)
   cfg.setdefault('hidden_act', 'ReLU')
   cfg.setdefault('output_act', 'Linear')
+
+  if cfg['device'] == 'cuda' and args.cuda_num is not None and args.cuda_num >= 0:
+    cfg['device'] = f'cuda:{args.cuda_num}'
+  if args.cuda_num == -1:
+    cfg['device'] = 'cpu'
+  print('device:', cfg['device'])
   
 
   # Set experiment name and log paths

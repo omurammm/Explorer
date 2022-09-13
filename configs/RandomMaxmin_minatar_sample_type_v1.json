@@ -1,0 +1,52 @@
+{
+  "env": [
+    {
+      "name": ["Asterix-MinAtar-v0", "Breakout-MinAtar-v0", "Freeway-MinAtar-v0", "SpaceInvaders-MinAtar-v0"],
+      "max_episode_steps": [-1],
+      "input_type": ["pixel"]
+    },
+    {
+      "name": ["Seaquest-MinAtar-v0"],
+      "max_episode_steps": [1e4],
+      "input_type": ["pixel"]
+    }
+  ],
+  "agent": [
+    {
+      "name": ["RandomMaxminDQN"],
+      "target_networks_num": [2,4,6,8],
+      "update_num": [1],
+      "sample_type": ["binomial"]
+    }
+  ],
+  "train_steps": [10e6],
+  "test_per_episodes": [-1],
+  "device": ["cuda"],
+  "feature_dim": [128],
+  "hidden_layers": [[]],
+  "memory_type": ["FiniteReplay"],
+  "memory_size": [1e5],
+  "exploration_type": ["LinearEpsilonGreedy"],
+  "exploration_steps": [5e3],
+  "epsilon_steps": [1e6],
+  "epsilon_start": [1.0],
+  "epsilon_end": [0.1],
+  "epsilon_decay": [0.999],
+  "loss": ["SmoothL1Loss"],
+  "optimizer": [
+    {
+      "name": ["RMSprop"],
+      "kwargs": [{"lr": [0.00025], "alpha": [0.95], "centered": [true], "eps": [0.01]}]
+    }
+  ],
+  "batch_size": [32],
+  "display_interval": [1000],
+  "rolling_score_window": [{"Train": [100], "Test": [10]}],
+  "discount": [0.99],
+  "seed": [1],
+  "show_tb": [false],
+  "gradient_clip": [-1],
+  "target_network_update_steps": [1000],
+  "network_update_steps": [1],
+  "generate_random_seed": [true]
+}

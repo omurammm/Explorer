@@ -91,12 +91,24 @@ for index in {1..12}
 do
   python main.py --config_file ./configs/RPG.json --config_idx $index
 done
+
+for index in {1..60}
+do
+  python main.py --config_file ./configs/RandomMaxmin_catcher.json --config_idx $index
+done
 ```
 
 [Parallel](https://www.gnu.org/software/parallel/) is usually a better choice to schedule a large number of jobs:
 
 ``` bash
 parallel --eta --ungroup python main.py --config_file ./configs/RPG.json --config_idx {1} ::: $(seq 1 12)
+
+parallel --eta -j 10 --ungroup python main.py --config_file ./configs/RandomMaxmin_catcher.json --config_idx {1} ::: $(seq 11 60)
+
+
+seq 1 100 | xargs -t -P50 -n1 python main.py --config_file ./configs/RandomMaxmin_minatar.json --cuda_num 0 --config_idx
+
+seq 1 8 | xargs -t -P4 -n1 python main.py --config_file ./configs/RandomMaxmin_atari_0.json --cuda_num 0 --config_idx
 ```
 
 Any configuration index that has the same remainder (divided by the number of total combinations) should have the same configuration dict. So for multiple runs, we just need to add the number of total combinations to the configuration index. For example, 5 runs for configuration index `1`:

@@ -1,3 +1,4 @@
+from turtle import up
 from agents.VanillaDQN import *
 
 
@@ -11,6 +12,18 @@ class MaxminDQN(VanillaDQN):
   def __init__(self, cfg):
     super().__init__(cfg)
     self.k = cfg['agent']['target_networks_num'] # number of target networks
+    if 'update_num' in cfg['agent']:
+      update_num = cfg['agent']['update_num']
+      if type(update_num) == int:
+        self.update_num = update_num
+      if update_num == 'half':
+        self.update_num = int(self.k // 2)
+      if update_num == 'all':
+        self.update_num = self.k
+    else:
+      self.update_num = 1
+    print('update network num:', self.update_num)
+
     # Create k different: Q value network, Target Q value network and Optimizer
     self.Q_net = [None] * self.k
     self.Q_net_target = [None] * self.k
@@ -25,8 +38,10 @@ class MaxminDQN(VanillaDQN):
 
   def learn(self):
     # Choose a Q_net to udpate
-    self.update_Q_net_index = np.random.choice(list(range(self.k)))
-    super().learn()
+    indice = np.random.choice(list(range(self.k)), size=self.update_num ,replace=False)
+    for i in indice:
+      self.update_Q_net_index = i
+      super().learn()
 
   def update_target_net(self):
     if self.step_count % self.cfg['target_network_update_steps'] == 0:
